@@ -25,15 +25,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized`}>
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized h-full`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
         >
-          <Navbar />
-          <main>{children}</main>
+          <div className="flex flex-col h-full">
+            <Navbar />
+            <main className="flex-1 relative overflow-hidden">
+              {children}
+            </main>
+          </div>
         </ThemeProvider>
       </body>
     </html>

@@ -4,7 +4,7 @@ import FloatingIsland from './FloatingIsland'
 const page = () => {
     return (
         <div>
-            <FloatingIsland />
+            {/* <FloatingIsland /> */}
         </div>
     )
 }

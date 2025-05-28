@@ -1,7 +1,5 @@
-// app/page.tsx
-
-import { useRef } from "react";
-
+'use client'
+import { useRef, useEffect } from "react";
 import MapProvider from "./map-content/MapProvider";
 // import MapStyles from "./map-content/MapStyles";
 import MapCotrols from "./map-content/MapControls";
@@ -10,8 +8,24 @@ import MapSearch from "./map-content/MapSearch";
 export default function Map() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
+  const lastScrollPosition = useRef(0)
+
+  useEffect(() => {
+    // Store current scroll position
+    lastScrollPosition.current = window.scrollY
+
+    // Prevent scroll without affecting map interactivity
+    const handleScroll = (e: Event) => {
+      window.scrollTo(0, 0)
+    }
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+
   return (
-    <div className="w-screen h-screen">
+    <div className="h-[100dvh] w-full">
       <div
         id="map-container"
         ref={mapContainerRef}
@@ -26,9 +40,8 @@ export default function Map() {
           zoom: 10,
         }}
       >
-        <MapSearch />
         <MapCotrols />
-        {/* <MapStyles /> */}
+        <MapSearch />
       </MapProvider>
     </div>
   );
