@@ -10,7 +10,7 @@ Hero: Headline + CTA
 Demo Screenshot
 Final CTA 
 */
-const page = () => {
+const Landing = () => {
 
     return (
         <section>
@@ -23,4 +23,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Landing
