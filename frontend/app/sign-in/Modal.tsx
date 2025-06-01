@@ -92,6 +92,25 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
         setCurrentMode(prev => prev === "login" ? "register" : "login");
     }
 
+    const handleSubmitForm = async (event: MouseEvent) => {
+        event.preventDefault();
+        if (currentMode === 'login') {
+            const data = { email: trackEmail?.toString(), password: trackPassword?.toString() }
+            const response = await fetch('/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            console.log(result);
+        }
+
+        if (currentMode === 'register') {
+
+        }
+
+    }
+
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -112,6 +131,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [onClose]);
+
 
     return (
         <section>
