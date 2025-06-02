@@ -3,10 +3,11 @@ import React, { useState, useRef, useEffect } from 'react'
 import validator from 'validator';
 import ErrorMsg from '../components/ui/ErrorMsg';
 import PasswordReq from '../components/ui/PasswordReq';
+import { AUTH_ERROR_MESSAGES } from './sharedErrors';
 
 
 const Modal = ({ onClose }: { onClose: () => void }) => {
-    const [currentMode, setCurrentMode] = useState<"login" | "register" | "reset">("login");
+    const [currentMode, setCurrentMode] = useState<"login" | "register" | "reset" | "activateAccount" | "passwordConfirmation">("login");
     const modalRef = useRef<HTMLDivElement>(null);
 
     const [trackEmail, setTrackEmail] = useState<string>();
@@ -19,18 +20,22 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
     const [symbolReq, setSymbolReq] = useState<boolean>(false);
 
 
+
+
     type ErrorState = {
         emailError: string;
         passwordError: string;
         nameError: string;
         symbolError: string;
+        backendError: string
     };
 
     const [isErrors, setIsErrors] = useState<ErrorState>({
         emailError: "",
         passwordError: "",
         nameError: "",
-        symbolError: ""
+        symbolError: "",
+        backendError: ""
     });
 
     const validatePassword = (password: string) => {
@@ -54,15 +59,6 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
         }));
     };
 
-    const validateEmail = (email: string) => {
-        let check = validator.isEmail(email);
-        if (!check) {
-            return setIsErrors({
-                ...isErrors,
-                emailError: "Email isn't valid."
-            });
-        }
-    }
 
     const validateForm = (field: string, value: string) => {
         switch (field) {
@@ -78,10 +74,24 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                 break;
             case "name":
                 setTrackName(value);
-                setIsErrors(prev => ({
-                    ...prev,
-                    nameError: value.trim().length > 2 ? "" : "Name too short"
-                }));
+                if (value.trim().length < 3) {
+                    setIsErrors({
+                        ...isErrors,
+                        nameError: "Name is too short"
+                    })
+                }
+                else if (value.trim().length > 16) {
+                    setIsErrors({
+                        ...isErrors,
+                        nameError: "Name is too long"
+                    })
+                } else {
+                    setIsErrors({
+                        ...isErrors,
+                        nameError: ""
+                    })
+                }
+
                 break;
         }
     };
@@ -92,22 +102,142 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
         setCurrentMode(prev => prev === "login" ? "register" : "login");
     }
 
-    const handleSubmitForm = async () => {
-        // event.preventDefault();
-        if (currentMode === 'login') {
-            const data = { email: trackEmail?.toString(), password: trackPassword?.toString() }
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
+    const handleSubmitForm = async (event: any) => {
+        event.preventDefault()
+        const nameError = isErrors.nameError.toString();
+        const passwordError = isErrors.passwordError.toString();
+        const symbolError = isErrors.symbolError.toString();
+        const emailError = isErrors.emailError.toString();
+        const backendError = isErrors.backendError.toString();
+        // console.log(passwordError);
 
-            const result = await response.json();
-            console.log(result); // Display the response from the backend
-        }
+        if (nameError === "" && passwordError === "" && symbolError === "" && emailError === "" && backendError === "") {
+            if (currentMode === 'login') {
+                const data = { email: trackEmail?.toString(), password: trackPassword?.toString() }
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                let status = response.status;
+                switch (status) {
+                    case 400:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[400]
+                        })
+                        break;
+                    case 201:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: ""
+                        })
+                        break;
+                    case 500:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[500]
+                        })
+                        break;
+                    case 503:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[503]
+                        })
+                        break;
+                    case 409:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[409]
+                        })
+                        break;
+                }
 
-        if (currentMode === 'register') {
+            }
 
+            if (currentMode === 'register') {
+                const data = { email: trackEmail?.toString(), password: trackPassword?.toString(), firstName: trackName?.toString() }
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                let status = response.status;
+                switch (status) {
+                    case 503:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[503]
+                        })
+                        break;
+                    case 409:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[409]
+                        })
+                        break;
+                    case 400:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[400]
+                        })
+                        break;
+                    case 201:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: ""
+                        })
+                        break;
+                    case 500:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[500]
+                        })
+                        break;
+                }
+            } if (currentMode === 'reset') {
+                const data = { email: trackEmail?.toString(), password: trackPassword?.toString(), firstName: trackName?.toString() }
+                const response = await fetch('/api/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                let status = response.status;
+                switch (status) {
+                    case 400:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[400]
+                        })
+                        break;
+                    case 201:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: ""
+                        })
+                        break;
+                    case 500:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[500]
+                        })
+                        break;
+                    case 503:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[503]
+                        })
+                        break;
+                    case 409:
+                        setIsErrors({
+                            ...isErrors,
+                            backendError: AUTH_ERROR_MESSAGES[409]
+                        })
+                        break;
+                }
+            }
+        } else {
+            return;
         }
 
     }
@@ -209,7 +339,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                                                 name="name"
                                                 type="text"
                                                 className={`mt-2 block w-full rounded-lg border ${isErrors.nameError ? 'border-red-500' : 'border-gray-300'
-                                                    } px-3 py-2 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:ring-offset-1`}
+                                                    } px-3 py-2 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:ring-offset- 1`}
                                                 onChange={(e) => validateForm("name", e.target.value)}
                                             />
                                             <ErrorMsg message={isErrors.nameError} className="mt-1" />
@@ -240,7 +370,7 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                                             </a>
                                         )}
                                     </p>
-                                    {currentMode === 'login' && (
+                                    {currentMode !== 'reset' && (
                                         <PasswordReq
                                             symbolDone={symbolReq}
                                             numDone={numReq}
@@ -251,10 +381,13 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                                     <button
                                         type="submit"
                                         className="inline-flex w-full items-center justify-center rounded-lg bg-black p-2 py-3 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-black focus:ring-offset-1 disabled:bg-gray-400"
-                                        onClick={() => { handleSubmitForm() }}
+                                        onClick={(mouseEvent) => handleSubmitForm(mouseEvent)}
                                     >
                                         Continue
                                     </button>
+                                    <div className='text-center mx-auto'>
+                                        <ErrorMsg message={isErrors.backendError} className='mt-1 mx-auto items-end' />
+                                    </div>
                                 </form>
                             </div>
                             <div className="mt-6 text-center text-sm text-slate-600 dark:text-white">
@@ -265,6 +398,11 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                                 >
                                     {currentMode === "login" ? " Sign Up" : " Login"}
                                 </a>
+                                {currentMode === "activateAccount" || currentMode === "passwordConfirmation" && (
+                                    <div>
+                                        <p>hello</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
