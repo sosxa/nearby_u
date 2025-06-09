@@ -6,6 +6,7 @@ import PasswordReq from '../components/ui/PasswordReq';
 import { AUTH_ERROR_MESSAGES } from './sharedErrors';
 import { useRouter } from 'next/navigation';
 import Spinner from '../components/ui/Spinner';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Modal = ({ onClose }: { onClose: () => void }) => {
     const [currentMode, setCurrentMode] = useState<"login" | "register" | "reset" | "activateAccount" | "passwordConfirmation">("login");
@@ -269,11 +270,28 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
         }
     }
 
+    const handleGoogleAuth = async (credentialResponse: any) => {
+        try {
+            // Send the Google token to your backend
+            const response = await fetch('/api/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: credentialResponse.credential }),
+            });
+            console.log("response")
+            console.log(response)
 
+            if (!response.ok) throw new Error('Backend auth failed');
+            const { user } = await response.json();
 
-
-
-
+            // Close modal or redirect
+            onClose();
+        } catch (error) {
+            console.log("error");
+            console.log(error);
+            setIsErrors({ ...isErrors, backendError: 'Google login failed' });
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -329,36 +347,28 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
 
                             {['login', 'register', 'reset'].includes(currentMode) ? (
                                 <div>
-                                    {currentMode !== 'reset' && (
-                                        <div className="flex w-full flex-col gap-2">
-                                            <div id="google-one-tap-button" className="w-full">
-                                                <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 92" fill="none" className="h-[18px] w-[18px]">
-                                                        <path
-                                                            d="M90 47.1c0-3.1-.3-6.3-.8-9.3H45.9v17.7h24.8c-1 5.7-4.3 10.7-9.2 13.9l14.8 11.5C85 72.8 90 61 90 47.1z"
-                                                            fill="#4280ef"></path>
-                                                        <path
-                                                            d="M45.9 91.9c12.4 0 22.8-4.1 30.4-11.1L61.5 69.4c-4.1 2.8-9.4 4.4-15.6 4.4-12 0-22.1-8.1-25.8-18.9L4.9 66.6c7.8 15.5 23.6 25.3 41 25.3z"
-                                                            fill="#34a353"></path>
-                                                        <path
-                                                            d="M20.1 54.8c-1.9-5.7-1.9-11.9 0-17.6L4.9 25.4c-6.5 13-6.5 28.3 0 41.2l15.2-11.8z"
-                                                            fill="#f6b704"></path>
-                                                        <path
-                                                            d="M45.9 18.3c6.5-.1 12.9 2.4 17.6 6.9L76.6 12C68.3 4.2 57.3 0 45.9.1c-17.4 0-33.2 9.8-41 25.3l15.2 11.8c3.7-10.9 13.8-18.9 25.8-18.9z"
-                                                            fill="#e54335"></path>
-                                                    </svg>
-                                                    Continue with Google
-                                                </button>
+                                    {currentMode !== 'reset' &&
+                                        currentMode !== "activateAccount" &&
+                                        currentMode !== "passwordConfirmation" && (
+                                            <div className="flex w-full flex-col gap-2">
+                                                {/* Replace your custom button with GoogleLogin */}
+                                                <GoogleLogin
+                                                    onSuccess={handleGoogleAuth}
+                                                    onError={() => setIsErrors({ ...isErrors, backendError: 'Google login failed' })}
+                                                    useOneTap={false}
+                                                />
                                             </div>
-                                        </div>
-                                    )}
-                                    {currentMode !== 'reset' && (
-                                        <div className="flex w-full items-center gap-2 py-6 text-sm text-slate-600 dark:text-white">
-                                            <div className="h-px w-full bg-slate-200"></div>
-                                            OR
-                                            <div className="h-px w-full bg-slate-200"></div>
-                                        </div>
-                                    )}
+                                        )
+                                    }
+                                    {currentMode !== 'reset'
+                                        && currentMode !== "activateAccount"
+                                        && currentMode !== "passwordConfirmation" && (
+                                            <div className="flex w-full items-center gap-2 py-6 text-sm text-slate-600 dark:text-white">
+                                                <div className="h-px w-full bg-slate-200"></div>
+                                                OR
+                                                <div className="h-px w-full bg-slate-200"></div>
+                                            </div>
+                                        )}
                                     <form className='w-full'>
                                         <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                             Email address
@@ -388,19 +398,21 @@ const Modal = ({ onClose }: { onClose: () => void }) => {
                                             </>
                                         )}
 
-                                        {currentMode !== "reset" && (
-                                            <>
-                                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-2">Password</label>
-                                                <input
-                                                    name="password"
-                                                    type="password"
-                                                    className={`mt-2 block w-full rounded-lg border ${isErrors.passwordError ? 'border-red-500' : 'border-gray-300'
-                                                        } px-3 py-2 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:ring-offset-1`}
-                                                    onChange={(e) => validateForm("password", e.target.value)}
-                                                />
-                                                <ErrorMsg message={isErrors.passwordError} className="mt-1" />
-                                            </>
-                                        )}
+                                        {currentMode !== 'reset'
+                                            && currentMode !== "activateAccount"
+                                            && currentMode !== "passwordConfirmation" && (
+                                                <>
+                                                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-2">Password</label>
+                                                    <input
+                                                        name="password"
+                                                        type="password"
+                                                        className={`mt-2 block w-full rounded-lg border ${isErrors.passwordError ? 'border-red-500' : 'border-gray-300'
+                                                            } px-3 py-2 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:ring-offset-1`}
+                                                        onChange={(e) => validateForm("password", e.target.value)}
+                                                    />
+                                                    <ErrorMsg message={isErrors.passwordError} className="mt-1" />
+                                                </>
+                                            )}
 
                                         <p className="mb-3 mt-2 text-sm text-gray-500">
                                             {currentMode === "login" && (

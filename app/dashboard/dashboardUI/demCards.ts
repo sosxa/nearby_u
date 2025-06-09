@@ -3,6 +3,7 @@ import React from 'react'
 
 const demoCards = [
   {
+    id: 1,
     title: "Card One",
     image: "https://picsum.photos/id/237/250",
     alt: "mbled it to make a type speci",
@@ -12,6 +13,7 @@ const demoCards = [
 
   },
   {
+    id: 2,
     title: "Card One",
     image: "https://picsum.photos/id/237/250",
     alt: "mbled it to make a type speci",
@@ -20,6 +22,7 @@ const demoCards = [
     attening: "1500",
   },
   {
+    id: 3,
     title: "Card One",
     image: "https://picsum.photos/id/237/250",
     alt: "mbled it to make a type speci",
@@ -28,6 +31,7 @@ const demoCards = [
     attening: "1500",
   },
   {
+    id: 4,
     title: "Card One",
     image: "https://picsum.photos/id/237/250",
     alt: "mbled it to make a type speci",
@@ -36,6 +40,7 @@ const demoCards = [
     attening: "1500",
   },
   {
+    id: 5,
     title: "Card One",
     image: "https://picsum.photos/id/237/250",
     alt: "mbled it to make a type speci",
@@ -44,6 +49,7 @@ const demoCards = [
     attening: "1500",
   },
   {
+    id: 6,
     title: "Card One",
     image: "https://picsum.photos/id/237/250",
     alt: "mbled it to make a type speci",
@@ -52,6 +58,7 @@ const demoCards = [
     attening: "1500",
   },
   {
+    id: 7,
     title: "Card One",
     image: "https://picsum.photos/id/237/250",
     alt: "mbled it to make a type speci",

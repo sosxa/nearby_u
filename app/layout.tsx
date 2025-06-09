@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "./components/themeprovider";
 import Navbar from "./components/Navbar";
 import "./globals.css";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,20 +29,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized h-full`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-        >
-          <div className="flex flex-col h-full">
-            <Navbar />
-            <main className="flex-1 relative overflow-hidden">
-              {children}
-            </main>
-          </div>
-        </ThemeProvider>
-      </body>
+      <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized h-full`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+          >
+            <div className="flex flex-col h-full">
+              <Navbar />
+              <main className="flex-1 relative overflow-hidden">
+                {children}
+              </main>
+            </div>
+          </ThemeProvider>
+        </body>
+      </GoogleOAuthProvider>
     </html>
   );
 }
