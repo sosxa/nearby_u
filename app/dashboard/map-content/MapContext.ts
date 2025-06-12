@@ -1,4 +1,5 @@
 // map-context.ts
+import mapboxgl from "mapbox-gl";
 import { createContext, useContext } from "react";
 
 interface MapContextType {

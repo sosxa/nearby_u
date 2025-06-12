@@ -2,16 +2,13 @@
 import React, { useState } from 'react'
 import { ThemeSwitch } from './ThemeSwitch'
 import Explore from '../dashboard/Explore';
-import Map from '../dashboard/Map';
+import Map from '../dashboard/EventMap';
 import Landing from '../landing/Landing';
 import Recommended from '../dashboard/Recommended';
 
 
-
 const Navbar = () => {
     const [currentTab, setCurrentTab] = useState<"home" | "map" | "for you" | "explore">("home");
-
-    
 
     return (
         <section>
@@ -75,7 +72,9 @@ const Navbar = () => {
                 {
                     currentTab === "home"
                     && (
-                        <Landing />
+                        // <Landing />
+                       <div>
+                       </div>
                     )
                 }
                 {

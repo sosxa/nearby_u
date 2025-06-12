@@ -267,7 +267,9 @@ body {
 }
 
 .swiper-pagination {
-  margin-top: 10rem;
+  position: static !important;
+  margin-top: 1.5rem;
+  text-align: center;
 }
 
 .swiper-pagination-bullet {
@@ -275,7 +277,6 @@ body {
   opacity: 0.7;
   width: 8px;
   height: 8px;
-  margin: 0 4px;
   border-radius: 9999px;
 }
 
@@ -284,8 +285,4 @@ body {
   opacity: 1;
   width: 10px;
   height: 10px;
-}
-
-#custom-swiper-patination {
-  margin-top: 5rem !important;
 }

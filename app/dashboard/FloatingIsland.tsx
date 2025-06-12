@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import Map from './Map';
+import Map from './EventMap';
 import Recommended from './Recommended';
 import Search from './Search';
 

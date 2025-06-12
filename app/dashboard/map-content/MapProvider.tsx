@@ -1,4 +1,3 @@
-// lib/mapbox/provider.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -6,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTheme } from "next-themes";
 import { MapContext } from "./MapContext";
+import Map, { Marker } from 'react-map-gl';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -16,6 +16,7 @@ type MapComponentProps = {
     latitude: number;
     zoom: number;
   };
+  markerCoords?: [number, number];
   children?: React.ReactNode;
 };
 
@@ -28,6 +29,22 @@ export default function MapProvider({
   const map = useRef<mapboxgl.Map | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  const locationMarkerRef = useRef<mapboxgl.Marker | null>(null);
+
+  // }, [loaded]);
+  useEffect(() => {
+    if (!map.current || map.current) return;
+
+    if (!locationMarkerRef.current) {
+      locationMarkerRef.current = new mapboxgl.Marker()
+        .setLngLat([40.841128, -74.664485])
+        .addTo(map.current);
+    } else {
+      // If marker already exists, just update its location
+      locationMarkerRef.current.setLngLat([40.841128, -74.664485]);
+    }
+  }, [loaded]);
+
   useEffect(() => {
     if (!mapContainerRef.current || map.current) return;
 
@@ -37,7 +54,7 @@ export default function MapProvider({
       center: [initialViewState.longitude, initialViewState.latitude],
       zoom: initialViewState.zoom,
       attributionControl: false,
-      logoPosition: "bottom-right",
+      logoPosition: undefined,
     });
 
     map.current.on("load", () => setLoaded(true));
@@ -57,9 +74,16 @@ export default function MapProvider({
 
   return (
     <div className="z-[1000]">
-      <MapContext.Provider value={{ map: map.current! }}>
+      <MapContext.Provider 
+      value={{ map: map.current! }}>
+        {loaded && (
+          <Marker longitude={-74.0060} latitude={40.7128} anchor="bottom">
+            <div style={{ fontSize: '24px' }}>📍</div>
+          </Marker>
+        )}
         {children}
       </MapContext.Provider>
+
       {!loaded && <LoadingOverlay />}
     </div>
   );
@@ -67,8 +91,8 @@ export default function MapProvider({
 
 // Helper function to get appropriate map style
 function getMapStyle(theme?: string) {
-  return theme === "dark" 
-    ? "mapbox://styles/mapbox/dark-v11" 
+  return theme === "dark"
+    ? "mapbox://styles/mapbox/dark-v11"
     : "mapbox://styles/mapbox/light-v11";
 }
 

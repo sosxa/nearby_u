@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
       <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized h-full`}>
+        <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized h-full`}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

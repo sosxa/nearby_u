@@ -33,13 +33,18 @@ const ExploreCards = () => {
 
     // Full responsive solution
     return (
-        <section className="w-full relative overflow-hidden px-10">
+        <section className="w-full relative overflow-visible px-10 pb-12">
+            <h1
+                className='text-4xl lg:text-6xl'
+            >
+                Hello Section
+            </h1>
             {isMounted && (
                 <>
                     {/* Left Arrow */}
                     <button
                         onClick={() => swiperRef.current?.swiper.slidePrev()}
-                        className="hidden lg:flex absolute top-1/2 -translate-y-1/2 left-0 z-10 dark:bg-slate-700 bg-white rounded-full shadow-md p-3 hover:bg-gray-100"
+                        className="hidden lg:flex absolute top-1/2 -translate-y-1/2 left-0 z-10 dark:bg-slate-700 bg-white rounded-full shadow-md p-3 hover:bg-gray-100 cursor-pointer"
                     >
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </button>
@@ -47,7 +52,7 @@ const ExploreCards = () => {
                     {/* Right Arrow */}
                     <button
                         onClick={() => swiperRef.current?.swiper.slideNext()}
-                        className="hidden lg:flex absolute top-1/2 -translate-y-1/2 right-0 z-10 dark:bg-slate-700 bg-white rounded-full shadow-md p-3 hover:bg-gray-100"
+                        className="hidden lg:flex absolute top-1/2 -translate-y-1/2 right-0 z-10 dark:bg-slate-700 bg-white rounded-full shadow-md p-3 hover:bg-gray-100 cursor-pointer"
                     >
                         <FontAwesomeIcon icon={faArrowRight} />
                     </button>
@@ -109,9 +114,10 @@ const ExploreCards = () => {
                             }, 300);
                         }}
                     >
+
                         {demoCards.map((card) => (
                             <SwiperSlide
-                                className='mt-14'
+                                className='mt-10 h-full'
                                 key={card.id}
                             >
                                 <div className="bg-white rounded-lg shadow-xl overflow-hidden relative">
@@ -127,7 +133,7 @@ const ExploreCards = () => {
                                     </div>
 
                                     <div className="p-4">
-                                        <h3 className="font-bold text-lg">{card.title}</h3>
+                                        <h3 className="font-bold text-lg dark:text-black text-white">{card.title}</h3>
                                         <p className="text-gray-600 text-sm">{card.location}</p>
                                     </div>
                                 </div>
