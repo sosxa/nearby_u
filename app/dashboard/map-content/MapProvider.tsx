@@ -1,102 +1,92 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import React, { useState, RefObject, useContext, createContext, useRef } from "react";
 import { useTheme } from "next-themes";
-import { MapContext } from "./MapContext";
-import Map, { Marker } from 'react-map-gl';
-
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
+import Map, { Marker, ViewState } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import type { MapRef } from 'react-map-gl';
 
 type MapComponentProps = {
-  mapContainerRef: React.RefObject<HTMLDivElement | null>;
   initialViewState: {
     longitude: number;
     latitude: number;
     zoom: number;
   };
-  markerCoords?: [number, number];
+  markerCoords?: [number, number]; // [lng, lat]
   children?: React.ReactNode;
+  bearing?: number;
+  pitch?: number;
+  longitude: number;
+  latitude: number;
 };
 
-export default function MapProvider({
-  mapContainerRef,
+type MapContextType = {
+  mapRef: React.RefObject<MapRef | null>;
+};
+
+export default function MapComponent({
   initialViewState,
+  longitude, latitude,
+  markerCoords = [longitude, latitude], // Default to NYC
   children,
 }: MapComponentProps) {
   const { resolvedTheme } = useTheme();
-  const map = useRef<mapboxgl.Map | null>(null);
+
+  const mapRef = useRef<MapRef | null>(null);
+
+  const [viewState, setViewState] = useState<ViewState>({
+    ...initialViewState,
+    bearing: 0,
+    pitch: 0,
+    padding: { top: 50, bottom: 50, left: 50, right: 50 },
+  });
+
   const [loaded, setLoaded] = useState(false);
 
-  const locationMarkerRef = useRef<mapboxgl.Marker | null>(null);
-
-  // }, [loaded]);
-  useEffect(() => {
-    if (!map.current || map.current) return;
-
-    if (!locationMarkerRef.current) {
-      locationMarkerRef.current = new mapboxgl.Marker()
-        .setLngLat([40.841128, -74.664485])
-        .addTo(map.current);
-    } else {
-      // If marker already exists, just update its location
-      locationMarkerRef.current.setLngLat([40.841128, -74.664485]);
-    }
-  }, [loaded]);
-
-  useEffect(() => {
-    if (!mapContainerRef.current || map.current) return;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: getMapStyle(resolvedTheme),
-      center: [initialViewState.longitude, initialViewState.latitude],
-      zoom: initialViewState.zoom,
-      attributionControl: false,
-      logoPosition: undefined,
-    });
-
-    map.current.on("load", () => setLoaded(true));
-
-    return () => {
-      map.current?.remove();
-      map.current = null;
-    };
-  }, [initialViewState, mapContainerRef]);
-
-  // Update map style when theme changes
-  useEffect(() => {
-    if (map.current && loaded) {
-      map.current.setStyle(getMapStyle(resolvedTheme));
-    }
-  }, [resolvedTheme, loaded]);
 
   return (
-    <div className="z-[1000]">
-      <MapContext.Provider 
-      value={{ map: map.current! }}>
-        {loaded && (
-          <Marker longitude={-74.0060} latitude={40.7128} anchor="bottom">
-            <div style={{ fontSize: '24px' }}>📍</div>
-          </Marker>
-        )}
-        {children}
+    <div className="z-[1000] relative">
+      <MapContext.Provider value={{ mapRef }}>
+        <Map
+          {...viewState}
+          ref={mapRef}
+          onMove={(evt) => setViewState(evt.viewState)}
+          onLoad={() => setLoaded(true)}
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+          mapStyle={getMapStyle(resolvedTheme)}
+          dragRotate={false}
+          touchZoomRotate={false}
+          style={{ width: "100%", height: "100vh" }}
+
+        >
+          {/* Optional Marker */}
+          {markerCoords && (
+            <Marker longitude={markerCoords[0]} latitude={markerCoords[1]} />
+          )}
+
+          {/* Any child content passed to the map */}
+          {children}
+        </Map>
       </MapContext.Provider>
 
       {!loaded && <LoadingOverlay />}
-    </div>
+    </div >
   );
 }
 
-// Helper function to get appropriate map style
+export const MapContext = createContext<MapContextType | null>(null);
+export function useMap() {
+  const context = useContext(MapContext);
+  if (!context) throw new Error("useMap must be used within MapProvider");
+  return { map: context.mapRef.current?.getMap() ?? null };
+}
+
 function getMapStyle(theme?: string) {
   return theme === "dark"
     ? "mapbox://styles/mapbox/dark-v11"
     : "mapbox://styles/mapbox/light-v11";
 }
 
-// Loading component
 function LoadingOverlay() {
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-[1000]">

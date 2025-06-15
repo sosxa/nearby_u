@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useMap } from "./MapContext";
+import { useMap } from "./MapProvider";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -66,7 +66,7 @@ export default function Popup({
       popup.remove();
 
       if (marker && marker.getPopup()) {
-        marker.setPopup(null);
+        marker.setPopup(undefined);
       }
     };
   }, [

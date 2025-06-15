@@ -273,7 +273,15 @@ body {
 }
 
 .swiper-pagination-bullet {
-  background-color: #cbd5e1;
+  background-color: #0c0e0f;
+  opacity: 0.7;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+}
+
+.dark .swiper-pagination-bullet {
+  background-color: #FAF9F6;
   opacity: 0.7;
   width: 8px;
   height: 8px;
@@ -281,6 +289,13 @@ body {
 }
 
 .swiper-pagination-bullet-active {
+  background-color: #b527b5;
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+}
+
+.dark .swiper-pagination-bullet-active {
   background-color: #b527b5;
   opacity: 1;
   width: 10px;

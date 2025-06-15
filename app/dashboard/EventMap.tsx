@@ -2,10 +2,9 @@
 import { useRef, useEffect, useState } from "react";
 import MapProvider from "./map-content/MapProvider";
 import MapControls from "./map-content/MapControls"; // Fixed typo in component name
-import MapSearch from "./map-content/MapSearch";
+import MapSearch from "./map-content/mapUI/filters/MapSearch";
 import { getLocation } from "./map-content/geolocation";
-
-
+import MapEventFilter from "./map-content/mapUI/filters/MapDistanceFilter";
 
 export default function MapComponent() { // Renamed component
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -66,25 +65,30 @@ export default function MapComponent() { // Renamed component
   }
 
   return (
-    <div className="h-[100dvh] w-full">
-      <div
-        id="map-container"
-        ref={mapContainerRef}
-        className="absolute inset-0 h-full w-full"
-      />
+    <>
+      <div className="h-[100dvh] w-full">
+        <div
+          id="map-container"
+          ref={mapContainerRef}
+        >
 
-      <MapProvider
-        mapContainerRef={mapContainerRef}
-        initialViewState={{
-          longitude: location.coords.longitude ?? -122.4194,
-          latitude: location.coords.latitude ?? 37.7749,
-          zoom: 14, // Better zoom level for markers
-        }}
-      >
+          <MapProvider
+            initialViewState={{
+              longitude: location.coords.longitude ?? -122.4194,
+              latitude: location.coords.latitude ?? 37.7749,
+              zoom: 15,
+            }}
+            longitude={location.coords.longitude ?? -122.4194}
+            latitude={location.coords.latitude ?? 37.7749}
+          >
 
-        <MapControls /> {/* Fixed component name */}
-        <MapSearch />
-      </MapProvider>
-    </div>
+            <MapEventFilter />
+            <MapControls />
+            <MapSearch />
+          </MapProvider>
+
+        </div >
+      </div>
+    </>
   );
 }
