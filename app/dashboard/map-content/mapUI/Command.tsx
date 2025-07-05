@@ -11,6 +11,8 @@ interface CommandInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     onClear?: () => void;
     isSearching?: boolean;
     wrapperClassName?: string;
+    onSubmitQuery?: (value: string) => void;
+    onValueChange?: (value: string) => void;
 }
 
 const Command = React.forwardRef<
@@ -35,29 +37,41 @@ interface CommandInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const CommandInput = forwardRef<HTMLInputElement, CommandInputProps>(
-    ({ className, wrapperClassName, onValueChange, ...props }, ref) => {
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            props.onChange?.(e);
-            onValueChange?.(e.target.value);
-        };
+  ({ className, wrapperClassName, onValueChange, onSubmitQuery, ...props }, ref) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      props.onChange?.(e);
+      onValueChange?.(e.target.value);
+    };
 
-        return (
-            <div className={cn("flex items-center border-b px-3", wrapperClassName)}>
-                <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                <input
-                    ref={ref}
-                    className={cn(
-                        "flex h-10 w-full bg-transparent py-2 text-sm outline-none",
-                        "placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
-                        className
-                    )}
-                    onChange={handleChange}
-                    {...props}
-                />
-            </div>
-        );
-    }
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (props.value) {
+          console.log("User submitted:", props.value);
+          onSubmitQuery?.(String(props.value));
+        }
+      }
+    };
+
+    return (
+      <div className={cn("flex items-center border-b px-3", wrapperClassName)}>
+        <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        <input
+          ref={ref}
+          className={cn(
+            "flex h-10 w-full bg-transparent py-2 text-sm outline-none",
+            "placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+            className
+          )}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown} 
+          {...props}
+        />
+      </div>
+    );
+  }
 );
+
 
 CommandInput.displayName = "CommandInput";
 
@@ -134,7 +148,7 @@ interface CommandItemProps<T = unknown> {
      * Item content
      */
     children?: React.ReactNode;
-  }
+}
 
 const CommandItem = forwardRef<HTMLLIElement, CommandItemProps>(
     ({ className, onSelect, value = "", selected, ...props }, ref) => {

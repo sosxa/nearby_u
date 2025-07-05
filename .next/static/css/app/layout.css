@@ -451,6 +451,7 @@ button.swiper-pagination-bullet {
     --color-red-600: oklch(57.7% 0.245 27.325);
     --color-red-800: oklch(44.4% 0.177 26.899);
     --color-orange-200: oklch(90.1% 0.076 70.697);
+    --color-yellow-100: oklch(97.3% 0.071 103.193);
     --color-yellow-600: oklch(68.1% 0.162 75.834);
     --color-yellow-800: oklch(47.6% 0.114 61.907);
     --color-green-100: oklch(96.2% 0.044 156.743);
@@ -479,10 +480,8 @@ button.swiper-pagination-bullet {
     --color-pink-500: oklch(65.6% 0.241 354.308);
     --color-rose-500: oklch(64.5% 0.246 16.439);
     --color-slate-200: oklch(92.9% 0.013 255.508);
-    --color-slate-400: oklch(70.4% 0.04 256.788);
     --color-slate-600: oklch(44.6% 0.043 257.281);
     --color-slate-700: oklch(37.2% 0.044 257.287);
-    --color-slate-800: oklch(27.9% 0.041 260.031);
     --color-slate-900: oklch(20.8% 0.042 265.755);
     --color-gray-50: oklch(98.5% 0.002 247.839);
     --color-gray-100: oklch(96.7% 0.003 264.542);
@@ -495,8 +494,6 @@ button.swiper-pagination-bullet {
     --color-gray-800: oklch(27.8% 0.033 256.848);
     --color-gray-900: oklch(21% 0.034 264.665);
     --color-zinc-200: oklch(92% 0.004 286.32);
-    --color-zinc-300: oklch(87.1% 0.006 286.286);
-    --color-zinc-600: oklch(44.2% 0.017 285.786);
     --color-neutral-200: oklch(92.2% 0 0);
     --color-neutral-400: oklch(70.8% 0 0);
     --color-neutral-500: oklch(55.6% 0 0);
@@ -511,6 +508,7 @@ button.swiper-pagination-bullet {
     --breakpoint-md: 48rem;
     --breakpoint-xl: 80rem;
     --breakpoint-2xl: 96rem;
+    --container-sm: 24rem;
     --container-md: 28rem;
     --container-lg: 32rem;
     --text-xs: 0.75rem;
@@ -736,6 +734,9 @@ button.swiper-pagination-bullet {
   .relative {
     position: relative;
   }
+  .sticky {
+    position: sticky;
+  }
   .inset-0 {
     inset: calc(var(--spacing) * 0);
   }
@@ -766,6 +767,9 @@ button.swiper-pagination-bullet {
   .right-0 {
     right: calc(var(--spacing) * 0);
   }
+  .right-1\/2 {
+    right: calc(1/2 * 100%);
+  }
   .right-4 {
     right: calc(var(--spacing) * 4);
   }
@@ -790,6 +794,9 @@ button.swiper-pagination-bullet {
   .left-2 {
     left: calc(var(--spacing) * 2);
   }
+  .left-4 {
+    left: calc(var(--spacing) * 4);
+  }
   .-z-10 {
     z-index: calc(10 * -1);
   }
@@ -802,14 +809,14 @@ button.swiper-pagination-bullet {
   .z-50 {
     z-index: 50;
   }
+  .z-100 {
+    z-index: 100;
+  }
   .z-\[999\] {
     z-index: 999;
   }
   .z-\[1000\] {
     z-index: 1000;
-  }
-  .col-span-2 {
-    grid-column: span 2 / span 2;
   }
   .container {
     width: 100%;
@@ -843,6 +850,9 @@ button.swiper-pagination-bullet {
   }
   .mx-4 {
     margin-inline: calc(var(--spacing) * 4);
+  }
+  .mx-10 {
+    margin-inline: calc(var(--spacing) * 10);
   }
   .mx-auto {
     margin-inline: auto;
@@ -961,9 +971,6 @@ button.swiper-pagination-bullet {
   .hidden {
     display: none;
   }
-  .inline {
-    display: inline;
-  }
   .inline-block {
     display: inline-block;
   }
@@ -1013,9 +1020,6 @@ button.swiper-pagination-bullet {
   .h-2 {
     height: calc(var(--spacing) * 2);
   }
-  .h-3 {
-    height: calc(var(--spacing) * 3);
-  }
   .h-3\.5 {
     height: calc(var(--spacing) * 3.5);
   }
@@ -1058,6 +1062,9 @@ button.swiper-pagination-bullet {
   .h-px {
     height: 1px;
   }
+  .h-screen {
+    height: 100vh;
+  }
   .max-h-\(--radix-dropdown-menu-content-available-height\) {
     max-height: var(--radix-dropdown-menu-content-available-height);
   }
@@ -1070,17 +1077,11 @@ button.swiper-pagination-bullet {
   .min-h-\[1em\] {
     min-height: 1em;
   }
-  .min-h-screen {
-    min-height: 100vh;
-  }
   .\!w-px {
     width: 1px !important;
   }
   .w-2 {
     width: calc(var(--spacing) * 2);
-  }
-  .w-3 {
-    width: calc(var(--spacing) * 3);
   }
   .w-3\.5 {
     width: calc(var(--spacing) * 3.5);
@@ -1100,9 +1101,6 @@ button.swiper-pagination-bullet {
   .w-12 {
     width: calc(var(--spacing) * 12);
   }
-  .w-56 {
-    width: calc(var(--spacing) * 56);
-  }
   .w-\[1\.2rem\] {
     width: 1.2rem;
   }
@@ -1118,26 +1116,17 @@ button.swiper-pagination-bullet {
   .w-\[300px\] {
     width: 300px;
   }
-  .w-\[400px\] {
-    width: 400px;
-  }
   .w-full {
     width: 100%;
   }
   .max-w-\[85rem\] {
     max-width: 85rem;
   }
-  .max-w-\[100px\] {
-    max-width: 100px;
-  }
-  .max-w-\[170px\] {
-    max-width: 170px;
-  }
   .max-w-\[270px\] {
     max-width: 270px;
   }
-  .max-w-full {
-    max-width: 100%;
+  .max-w-\[280px\] {
+    max-width: 280px;
   }
   .max-w-lg {
     max-width: var(--container-lg);
@@ -1154,8 +1143,8 @@ button.swiper-pagination-bullet {
   .max-w-screen-xl {
     max-width: var(--breakpoint-xl);
   }
-  .min-w-0 {
-    min-width: calc(var(--spacing) * 0);
+  .max-w-sm {
+    max-width: var(--container-sm);
   }
   .min-w-\[8rem\] {
     min-width: 8rem;
@@ -1207,9 +1196,6 @@ button.swiper-pagination-bullet {
   .rotate-90 {
     rotate: 90deg;
   }
-  .rotate-180 {
-    rotate: 180deg;
-  }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
@@ -1224,6 +1210,9 @@ button.swiper-pagination-bullet {
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+  .resize {
+    resize: both;
   }
   .list-inside {
     list-style-position: inside;
@@ -1301,6 +1290,13 @@ button.swiper-pagination-bullet {
       margin-block-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-y-reverse)));
     }
   }
+  .space-y-6 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 6) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 6) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
   .gap-x-2 {
     -moz-column-gap: calc(var(--spacing) * 2);
          column-gap: calc(var(--spacing) * 2);
@@ -1372,6 +1368,9 @@ button.swiper-pagination-bullet {
   .rounded {
     border-radius: 0.25rem;
   }
+  .rounded-\[30px\] {
+    border-radius: 30px;
+  }
   .rounded-full {
     border-radius: calc(infinity * 1px);
   }
@@ -1437,9 +1436,6 @@ button.swiper-pagination-bullet {
   .border-gray-300 {
     border-color: var(--color-gray-300);
   }
-  .border-green-500 {
-    border-color: var(--color-green-500);
-  }
   .border-red-500 {
     border-color: var(--color-red-500);
   }
@@ -1497,9 +1493,6 @@ button.swiper-pagination-bullet {
   .bg-gray-200 {
     background-color: var(--color-gray-200);
   }
-  .bg-gray-900 {
-    background-color: var(--color-gray-900);
-  }
   .bg-green-100 {
     background-color: var(--color-green-100);
   }
@@ -1508,6 +1501,9 @@ button.swiper-pagination-bullet {
   }
   .bg-muted {
     background-color: var(--muted);
+  }
+  .bg-neutral-200 {
+    background-color: var(--color-neutral-200);
   }
   .bg-orange-200 {
     background-color: var(--color-orange-200);
@@ -1536,26 +1532,20 @@ button.swiper-pagination-bullet {
   .bg-purple-600 {
     background-color: var(--color-purple-600);
   }
+  .bg-purple-800 {
+    background-color: var(--color-purple-800);
+  }
   .bg-red-200 {
     background-color: var(--color-red-200);
   }
   .bg-rose-500 {
     background-color: var(--color-rose-500);
   }
-  .bg-rose-500\/10 {
-    background-color: color-mix(in srgb, oklch(64.5% 0.246 16.439) 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-rose-500) 10%, transparent);
-    }
-  }
   .bg-secondary {
     background-color: var(--secondary);
   }
   .bg-slate-200 {
     background-color: var(--color-slate-200);
-  }
-  .bg-slate-400 {
-    background-color: var(--color-slate-400);
   }
   .bg-transparent {
     background-color: transparent;
@@ -1569,14 +1559,8 @@ button.swiper-pagination-bullet {
       background-color: color-mix(in oklab, var(--color-white) 80%, transparent);
     }
   }
-  .bg-zinc-200 {
-    background-color: var(--color-zinc-200);
-  }
-  .bg-zinc-300 {
-    background-color: var(--color-zinc-300);
-  }
-  .bg-zinc-600 {
-    background-color: var(--color-zinc-600);
+  .bg-yellow-100 {
+    background-color: var(--color-yellow-100);
   }
   .bg-gradient-to-r {
     --tw-gradient-position: to right in oklab;
@@ -1586,16 +1570,16 @@ button.swiper-pagination-bullet {
     --tw-gradient-position: to top right in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
-  .from-blue-900 {
-    --tw-gradient-from: var(--color-blue-900);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
   .from-gray-100 {
     --tw-gradient-from: var(--color-gray-100);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .from-purple-500 {
     --tw-gradient-from: var(--color-purple-500);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .from-purple-900 {
+    --tw-gradient-from: var(--color-purple-900);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .via-white\/0 {
@@ -1606,12 +1590,12 @@ button.swiper-pagination-bullet {
     --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
     --tw-gradient-stops: var(--tw-gradient-via-stops);
   }
-  .to-blue-400 {
-    --tw-gradient-to: var(--color-blue-400);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
   .to-pink-500 {
     --tw-gradient-to: var(--color-pink-500);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .to-purple-400 {
+    --tw-gradient-to: var(--color-purple-400);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .to-white\/0 {
@@ -1698,9 +1682,6 @@ button.swiper-pagination-bullet {
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
   }
-  .py-2\.5 {
-    padding-block: calc(var(--spacing) * 2.5);
-  }
   .py-3 {
     padding-block: calc(var(--spacing) * 3);
   }
@@ -1725,9 +1706,6 @@ button.swiper-pagination-bullet {
   .pe-4 {
     padding-inline-end: calc(var(--spacing) * 4);
   }
-  .pt-2 {
-    padding-top: calc(var(--spacing) * 2);
-  }
   .pt-3 {
     padding-top: calc(var(--spacing) * 3);
   }
@@ -1742,9 +1720,6 @@ button.swiper-pagination-bullet {
   }
   .text-center {
     text-align: center;
-  }
-  .text-right {
-    text-align: right;
   }
   .align-\[-0\.125em\] {
     vertical-align: -0.125em;
@@ -1780,6 +1755,9 @@ button.swiper-pagination-bullet {
   .text-xs {
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .text-\[\.80rem\] {
+    font-size: .80rem;
   }
   .leading-4 {
     --tw-leading: calc(var(--spacing) * 4);
@@ -1926,11 +1904,11 @@ button.swiper-pagination-bullet {
   .opacity-50 {
     opacity: 50%;
   }
-  .opacity-70 {
-    opacity: 70%;
-  }
   .opacity-75 {
     opacity: 75%;
+  }
+  .opacity-80 {
+    opacity: 80%;
   }
   .shadow {
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
@@ -1972,6 +1950,9 @@ button.swiper-pagination-bullet {
     outline-style: var(--tw-outline-style);
     outline-width: 1px;
   }
+  .outline-purple-500 {
+    outline-color: var(--color-purple-500);
+  }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
@@ -1997,11 +1978,6 @@ button.swiper-pagination-bullet {
   }
   .transition-shadow {
     transition-property: box-shadow;
-    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-    transition-duration: var(--tw-duration, var(--default-transition-duration));
-  }
-  .transition-transform {
-    transition-property: transform, translate, scale, rotate;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
@@ -2116,6 +2092,16 @@ button.swiper-pagination-bullet {
       }
     }
   }
+  .hover\:bg-primary\/20 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--primary);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--primary) 20%, transparent);
+        }
+      }
+    }
+  }
   .hover\:bg-primary\/90 {
     &:hover {
       @media (hover: hover) {
@@ -2130,27 +2116,6 @@ button.swiper-pagination-bullet {
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-purple-300);
-      }
-    }
-  }
-  .hover\:bg-purple-500 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-purple-500);
-      }
-    }
-  }
-  .hover\:bg-purple-700 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-purple-700);
-      }
-    }
-  }
-  .hover\:bg-purple-800 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-purple-800);
       }
     }
   }
@@ -2192,6 +2157,13 @@ button.swiper-pagination-bullet {
       }
     }
   }
+  .hover\:text-gray-800 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-gray-800);
+      }
+    }
+  }
   .hover\:text-purple-800 {
     &:hover {
       @media (hover: hover) {
@@ -2203,6 +2175,14 @@ button.swiper-pagination-bullet {
     &:hover {
       @media (hover: hover) {
         text-decoration-line: underline;
+      }
+    }
+  }
+  .hover\:shadow {
+    &:hover {
+      @media (hover: hover) {
+        --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
       }
     }
   }
@@ -2219,6 +2199,31 @@ button.swiper-pagination-bullet {
       @media (hover: hover) {
         --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
         box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+    }
+  }
+  .hover\:shadow-purple-500 {
+    &:hover {
+      @media (hover: hover) {
+        --tw-shadow-color: oklch(62.7% 0.265 303.9);
+        @supports (color: color-mix(in lab, red, red)) {
+          --tw-shadow-color: color-mix(in oklab, var(--color-purple-500) var(--tw-shadow-alpha), transparent);
+        }
+      }
+    }
+  }
+  .hover\:outline {
+    &:hover {
+      @media (hover: hover) {
+        outline-style: var(--tw-outline-style);
+        outline-width: 1px;
+      }
+    }
+  }
+  .hover\:outline-purple-600 {
+    &:hover {
+      @media (hover: hover) {
+        outline-color: var(--color-purple-600);
       }
     }
   }
@@ -2263,12 +2268,6 @@ button.swiper-pagination-bullet {
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
     }
   }
-  .focus\:ring-4 {
-    &:focus {
-      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
-      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-    }
-  }
   .focus\:ring-black {
     &:focus {
       --tw-ring-color: var(--color-black);
@@ -2287,6 +2286,16 @@ button.swiper-pagination-bullet {
   .focus\:ring-gray-200 {
     &:focus {
       --tw-ring-color: var(--color-gray-200);
+    }
+  }
+  .focus\:ring-purple-500 {
+    &:focus {
+      --tw-ring-color: var(--color-purple-500);
+    }
+  }
+  .focus\:ring-purple-800 {
+    &:focus {
+      --tw-ring-color: var(--color-purple-800);
     }
   }
   .focus\:ring-ring {
@@ -2546,9 +2555,9 @@ button.swiper-pagination-bullet {
       animation: spin 1.5s linear infinite;
     }
   }
-  .sm\:left-4 {
+  .sm\:right-4 {
     @media (width >= 40rem) {
-      left: calc(var(--spacing) * 4);
+      right: calc(var(--spacing) * 4);
     }
   }
   .sm\:mt-0 {
@@ -2595,11 +2604,6 @@ button.swiper-pagination-bullet {
     @media (width >= 40rem) {
       --tw-translate-x: calc(var(--spacing) * 0);
       translate: var(--tw-translate-x) var(--tw-translate-y);
-    }
-  }
-  .sm\:grid-cols-4 {
-    @media (width >= 40rem) {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   .sm\:flex-row {
@@ -2675,6 +2679,11 @@ button.swiper-pagination-bullet {
       line-height: var(--tw-leading, var(--text-sm--line-height));
     }
   }
+  .md\:mx-0 {
+    @media (width >= 48rem) {
+      margin-inline: calc(var(--spacing) * 0);
+    }
+  }
   .md\:mt-0 {
     @media (width >= 48rem) {
       margin-top: calc(var(--spacing) * 0);
@@ -2705,6 +2714,11 @@ button.swiper-pagination-bullet {
       width: auto;
     }
   }
+  .md\:max-w-none {
+    @media (width >= 48rem) {
+      max-width: none;
+    }
+  }
   .md\:grid-cols-2 {
     @media (width >= 48rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2718,6 +2732,11 @@ button.swiper-pagination-bullet {
   .md\:items-center {
     @media (width >= 48rem) {
       align-items: center;
+    }
+  }
+  .md\:justify-start {
+    @media (width >= 48rem) {
+      justify-content: flex-start;
     }
   }
   .md\:space-x-8 {
@@ -2740,6 +2759,17 @@ button.swiper-pagination-bullet {
       background-color: transparent;
     }
   }
+  .md\:text-left {
+    @media (width >= 48rem) {
+      text-align: left;
+    }
+  }
+  .md\:text-base {
+    @media (width >= 48rem) {
+      font-size: var(--text-base);
+      line-height: var(--tw-leading, var(--text-base--line-height));
+    }
+  }
   .lg\:flex {
     @media (width >= 64rem) {
       display: flex;
@@ -2753,6 +2783,16 @@ button.swiper-pagination-bullet {
   .lg\:w-1\/3 {
     @media (width >= 64rem) {
       width: calc(1/3 * 100%);
+    }
+  }
+  .lg\:w-\[30\%\] {
+    @media (width >= 64rem) {
+      width: 30%;
+    }
+  }
+  .lg\:grid-cols-4 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   .lg\:px-6 {
@@ -2781,6 +2821,11 @@ button.swiper-pagination-bullet {
     @media (width >= 64rem) {
       --tw-leading: var(--leading-tight);
       line-height: var(--leading-tight);
+    }
+  }
+  .xl\:w-\[32\%\] {
+    @media (width >= 80rem) {
+      width: 32%;
     }
   }
   .xl\:gap-16 {
@@ -2854,11 +2899,6 @@ button.swiper-pagination-bullet {
       }
     }
   }
-  .dark\:border-gray-500 {
-    &:is(.dark *) {
-      border-color: var(--color-gray-500);
-    }
-  }
   .dark\:border-gray-600 {
     &:is(.dark *) {
       border-color: var(--color-gray-600);
@@ -2884,6 +2924,16 @@ button.swiper-pagination-bullet {
       border-color: var(--color-neutral-800);
     }
   }
+  .dark\:bg-\[\#1f1f1f\] {
+    &:is(.dark *) {
+      background-color: #1f1f1f;
+    }
+  }
+  .dark\:bg-\[\#3A3A3A\] {
+    &:is(.dark *) {
+      background-color: #3A3A3A;
+    }
+  }
   .dark\:bg-\[\#262626\] {
     &:is(.dark *) {
       background-color: #262626;
@@ -2900,26 +2950,6 @@ button.swiper-pagination-bullet {
       @supports (color: color-mix(in lab, red, red)) {
         background-color: color-mix(in oklab, var(--destructive) 60%, transparent);
       }
-    }
-  }
-  .dark\:bg-gray-600 {
-    &:is(.dark *) {
-      background-color: var(--color-gray-600);
-    }
-  }
-  .dark\:bg-gray-700 {
-    &:is(.dark *) {
-      background-color: var(--color-gray-700);
-    }
-  }
-  .dark\:bg-gray-800 {
-    &:is(.dark *) {
-      background-color: var(--color-gray-800);
-    }
-  }
-  .dark\:bg-gray-900 {
-    &:is(.dark *) {
-      background-color: var(--color-gray-900);
     }
   }
   .dark\:bg-input\/30 {
@@ -2955,19 +2985,9 @@ button.swiper-pagination-bullet {
       background-color: var(--color-purple-700);
     }
   }
-  .dark\:bg-purple-800 {
-    &:is(.dark *) {
-      background-color: var(--color-purple-800);
-    }
-  }
   .dark\:bg-slate-700 {
     &:is(.dark *) {
       background-color: var(--color-slate-700);
-    }
-  }
-  .dark\:bg-slate-800 {
-    &:is(.dark *) {
-      background-color: var(--color-slate-800);
     }
   }
   .dark\:bg-stone-900 {
@@ -2978,11 +2998,6 @@ button.swiper-pagination-bullet {
   .dark\:bg-transparent {
     &:is(.dark *) {
       background-color: transparent;
-    }
-  }
-  .dark\:bg-white {
-    &:is(.dark *) {
-      background-color: var(--color-white);
     }
   }
   .dark\:from-neutral-800 {
@@ -3025,9 +3040,9 @@ button.swiper-pagination-bullet {
       color: var(--color-blue-500);
     }
   }
-  .dark\:text-gray-100 {
+  .dark\:text-gray-200 {
     &:is(.dark *) {
-      color: var(--color-gray-100);
+      color: var(--color-gray-200);
     }
   }
   .dark\:text-gray-300 {
@@ -3038,11 +3053,6 @@ button.swiper-pagination-bullet {
   .dark\:text-gray-400 {
     &:is(.dark *) {
       color: var(--color-gray-400);
-    }
-  }
-  .dark\:text-gray-900 {
-    &:is(.dark *) {
-      color: var(--color-gray-900);
     }
   }
   .dark\:text-green-400 {
@@ -3103,9 +3113,18 @@ button.swiper-pagination-bullet {
       }
     }
   }
-  .dark\:ring-offset-gray-700 {
+  .dark\:outline-purple-600 {
     &:is(.dark *) {
-      --tw-ring-offset-color: var(--color-gray-700);
+      outline-color: var(--color-purple-600);
+    }
+  }
+  .dark\:hover\:bg-\[\#4A4A4A\] {
+    &:is(.dark *) {
+      &:hover {
+        @media (hover: hover) {
+          background-color: #4A4A4A;
+        }
+      }
     }
   }
   .dark\:hover\:bg-accent\/50 {
@@ -3168,15 +3187,6 @@ button.swiper-pagination-bullet {
       }
     }
   }
-  .dark\:hover\:bg-purple-600 {
-    &:is(.dark *) {
-      &:hover {
-        @media (hover: hover) {
-          background-color: var(--color-purple-600);
-        }
-      }
-    }
-  }
   .dark\:hover\:bg-purple-800 {
     &:is(.dark *) {
       &:hover {
@@ -3203,6 +3213,15 @@ button.swiper-pagination-bullet {
       &:hover {
         @media (hover: hover) {
           color: var(--color-neutral-500);
+        }
+      }
+    }
+  }
+  .dark\:hover\:text-white {
+    &:is(.dark *) {
+      &:hover {
+        @media (hover: hover) {
+          color: var(--color-white);
         }
       }
     }
@@ -3235,6 +3254,13 @@ button.swiper-pagination-bullet {
     &:is(.dark *) {
       &:focus {
         --tw-ring-color: var(--color-neutral-600);
+      }
+    }
+  }
+  .focus\:dark\:ring-purple-600 {
+    &:focus {
+      &:is(.dark *) {
+        --tw-ring-color: var(--color-purple-600);
       }
     }
   }

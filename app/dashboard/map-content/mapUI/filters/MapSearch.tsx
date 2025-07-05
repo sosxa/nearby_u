@@ -19,32 +19,33 @@ import {
   LocationFeature,
   LocationSuggestion,
 } from "../../MapUtils";
-import { LocationMarker } from "../../LocationMarker";
-import { LocationPopup } from "../../LocationPopUp";
 
-export default function MapSearch() {
-  const { map } = useMap();
+interface MapSearchProps {
+  onSelectLocations: (locations: LocationFeature[]) => void;
+  onClear: () => void;
+}
+
+export default function MapSearch({ onSelectLocations, onClear }: MapSearchProps) {
+  const { map } = useMap(); // Access the map instance from context
+
   const [sessionToken] = useState(() => {
-    // Generate a unique session token for each user
+    // Generate a unique session token for Mapbox Search API
     if (typeof crypto !== 'undefined') {
-      return crypto.randomUUID(); // Browser's built-in crypto API
+      return crypto.randomUUID();
     }
-    // Fallback for non-secure contexts or older browsers
     return Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
   });
 
-  const [query, setQuery] = useState("");
-  const [displayValue, setDisplayValue] = useState("");
-  const [results, setResults] = useState<LocationSuggestion[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] =
-    useState<LocationFeature | null>(null);
-  const [selectedLocations, setSelectedLocations] = useState<LocationFeature[]>([]);
-  const debouncedQuery = useDebounce(query, 400);
+  const [query, setQuery] = useState("");                        // Raw user input
+  const [displayValue, setDisplayValue] = useState("");          // What's shown in the input field
+  const [results, setResults] = useState<LocationSuggestion[]>([]); // Autocomplete suggestions
+  const [isSearching, setIsSearching] = useState(false);         // Loading state
+  const [isOpen, setIsOpen] = useState(false);                   // Show/hide dropdown
+  const debouncedQuery = useDebounce(query, 400); // Delay search API calls
 
   useEffect(() => {
+    // Fetch autocomplete suggestions when query changes
     if (!debouncedQuery.trim()) {
       setResults([]);
       setIsOpen(false);
@@ -79,6 +80,12 @@ export default function MapSearch() {
   const handleInputChange = (value: string) => {
     setQuery(value);
     setDisplayValue(value);
+
+    // Clear results when input is empty
+    if (!value.trim()) {
+      setResults([]);
+      setIsOpen(false);
+    }
   };
 
   const handleSelect = async (suggestion: LocationSuggestion) => {
@@ -95,6 +102,7 @@ export default function MapSearch() {
       if (map && featuresData?.length > 0) {
         const coordinates = featuresData[0]?.geometry?.coordinates;
 
+        // Fly to location
         map.flyTo({
           center: coordinates,
           zoom: 14,
@@ -103,11 +111,13 @@ export default function MapSearch() {
           essential: true,
         });
 
+        // Update UI
         setDisplayValue(suggestion.name);
-        setSelectedLocations(featuresData);
-        setSelectedLocation(featuresData[0]);
         setResults([]);
         setIsOpen(false);
+
+        // Notify parent component of selected locations
+        onSelectLocations(featuresData);
       }
     } catch (err) {
       console.error("Retrieve error:", err);
@@ -117,101 +127,87 @@ export default function MapSearch() {
   };
 
   const clearSearch = () => {
+    // Clear input and suggestions
     setQuery("");
     setDisplayValue("");
     setResults([]);
     setIsOpen(false);
-    setSelectedLocation(null);
-    setSelectedLocations([]);
+
+    // Notify parent component to clear locations
+    onClear();
   };
 
   return (
-    <>
-      <section className="absolute top-0 my-25 left-1/2 sm:left-4 z-10 w-[90vw] sm:w-[350px] -translate-x-1/2 sm:translate-x-0 rounded-lg shadow-lg">
-        <Command className="rounded-lg">
-          <div
-            className={cn(
-              "w-full flex items-center justify-between px-3 gap-1",
-              isOpen && "border-b"
-            )}
-          >
-            <CommandInput
-              placeholder="Search locations..."
-              value={displayValue}
-              onValueChange={handleInputChange}
-              className="flex-1"
-            />
-            {displayValue && !isSearching && (
-              <X
-                className="size-4 shrink-0 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                onClick={clearSearch}
-              />
-            )}
-            {isSearching && (
-              <Loader2 className="size-4 shrink-0 text-primary animate-spin" />
-            )}
-          </div>
-
-          {isOpen && (
-            <CommandList className="max-h-60 overflow-y-auto">
-              {!query.trim() || isSearching ? null : results.length === 0 ? (
-                <CommandEmpty className="py-6 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-1">
-                    <p className="text-sm font-medium">No locations found</p>
-                    <p className="text-xs text-muted-foreground">
-                      Try a different search term
-                    </p>
-                  </div>
-                </CommandEmpty>
-              ) : (
-                <CommandGroup>
-                  {results.map((location) => (
-                    <CommandItem
-                      key={location.mapbox_id}
-                      onSelect={() => handleSelect(location)}
-                      value={`${location.name} ${location.place_formatted} ${location.mapbox_id}`}
-                      className="flex items-center py-3 px-2 cursor-pointer hover:bg-accent rounded-md"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <div className="bg-primary/10 p-1.5 rounded-full">
-                          {location.maki && iconMap[location.maki] ? (
-                            iconMap[location.maki]
-                          ) : (
-                            <MapPin className="h-4 w-4 text-primary" />
-                          )}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium truncate max-w-[270px]">
-                            {location.name}
-                          </span>
-                          <span className="text-xs text-muted-foreground truncate max-w-[270px]">
-                            {location.place_formatted}
-                          </span>
-                        </div>
-                      </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              )}
-            </CommandList>
+    <section className="absolute top-0 my-25 right-1/2 sm:right-4 z-10 w-[90vw] sm:w-[350px] -translate-x-1/2 sm:translate-x-0 rounded-lg shadow-lg">
+      <Command className="rounded-lg">
+        <div
+          className={cn(
+            "w-full flex items-center justify-between px-3 gap-1",
+            isOpen && "border-b"
           )}
-        </Command>
-      </section>
+        >
+          <CommandInput
+            placeholder="Search locations..."
+            value={displayValue}
+            onValueChange={handleInputChange}
+            className="flex-1"
+          />
+          {displayValue && !isSearching && (
+            <X
+              className="size-4 shrink-0 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={clearSearch}
+            />
+          )}
+          {isSearching && (
+            <Loader2 className="size-4 shrink-0 text-primary animate-spin" />
+          )}
+        </div>
 
-      {selectedLocations.map((location) => (
-        <LocationMarker
-          key={location.properties.mapbox_id}
-          location={location}
-          onHover={(data) => setSelectedLocation(data)}
-        />
-      ))}
-
-      {selectedLocation && (
-        <LocationPopup
-          location={selectedLocation}
-          onClose={() => setSelectedLocation(null)}
-        />
-      )}
-    </>
+        {/* Suggestion list */}
+        {isOpen && (
+          <CommandList className="max-h-60 overflow-y-auto">
+            {!query.trim() || isSearching ? null : results.length === 0 ? (
+              <CommandEmpty className="py-6 text-center">
+                <div className="flex flex-col items-center justify-center space-y-1">
+                  <p className="text-sm font-medium">No locations found</p>
+                  <p className="text-xs text-muted-foreground">
+                    Try a different search term
+                  </p>
+                </div>
+              </CommandEmpty>
+            ) : (
+              <CommandGroup>
+                {results.map((location) => (
+                  <CommandItem
+                    key={location.mapbox_id}
+                    onSelect={() => handleSelect(location)}
+                    value={`${location.name} ${location.place_formatted} ${location.mapbox_id}`}
+                    className="flex items-center py-3 px-2 cursor-pointer hover:bg-accent rounded-md"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="bg-primary/10 p-1.5 rounded-full">
+                        {location.maki && iconMap[location.maki] ? (
+                          iconMap[location.maki]
+                        ) : (
+                          <MapPin className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium truncate max-w-[270px]">
+                          {location.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[270px]">
+                          {location.place_formatted}
+                        </span>
+                      </div>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        )}
+      </Command>
+    </section>
   );
 }

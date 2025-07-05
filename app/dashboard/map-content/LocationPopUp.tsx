@@ -1,47 +1,28 @@
-import { LocationFeature, iconMap } from "./MapUtils";
-import { cn } from "@/lib/utils";
-import {
-  LocateIcon,
-  MapPin,
-  Navigation,
-  Star,
-  ExternalLink,
-} from "lucide-react";
-
+"use client";
+import { LocationFeature } from "./MapUtils";
+import { MapPin, Navigation, X } from "lucide-react";
 import { Button } from "./mapUI/Button";
 import Popup from "./MapPopUp";
-import { Badge } from "./mapUI/Badge";
 import { Separator } from "./mapUI/Separator";
 
 type LocationPopupProps = {
   location: LocationFeature;
   onClose?: () => void;
 };
+
 export function LocationPopup({ location, onClose }: LocationPopupProps) {
   if (!location) return null;
 
   const { properties, geometry } = location;
 
-  const name = properties?.name || "Unknown Location";
-  const address = properties?.full_address || properties?.address || "";
-  const categories = properties?.poi_category || [];
-  const brand = properties?.brand?.[0] || "";
-  const status = properties?.operational_status || "";
-  const maki = properties?.maki || "";
+  const name = properties?.name || "Selected Location";
+  const address = properties?.place_formatted ||
+    properties?.full_address ||
+    properties?.address ||
+    "Address not available";
 
   const lat = geometry?.coordinates?.[1] || properties?.coordinates?.latitude;
   const lng = geometry?.coordinates?.[0] || properties?.coordinates?.longitude;
-
-  const getIcon = () => {
-    const allKeys = [maki, ...(categories || [])];
-
-    for (const key of allKeys) {
-      const lower = key?.toLowerCase();
-      if (iconMap[lower]) return iconMap[lower];
-    }
-
-    return <LocateIcon className="h-5 w-5" />;
-  };
 
   return (
     <Popup
@@ -54,66 +35,32 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
       className="location-popup"
       focusAfterOpen={false}
     >
-      <div className="w-[300px] sm:w-[350px]">
-        <div className="flex items-start gap-3">
-          <div className="bg-rose-500/10 p-2 rounded-full shrink-0">
-            {getIcon()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-1">
-              <h3 className="font-medium text-base truncate">{name}</h3>
-              {status && (
-                <Badge
-                  variant={status === "active" ? "outline" : "secondary"}
-                  className={cn(
-                    "text-xs",
-                    status === "active" ? "border-green-500 text-green-600" : ""
-                  )}
-                >
-                  {status === "active" ? "Open" : status}
-                </Badge>
-              )}
+      <div className="w-[300px] sm:w-[350px] p-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-bold text-lg truncate">{name}</h3>
+            <div className="flex items-start mt-2">
+              <MapPin className="h-4 w-4 mt-0.5 mr-2 text-muted-foreground flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">{address}</p>
             </div>
-            {brand && brand !== name && (
-              <p className="text-sm font-medium text-muted-foreground">
-                {brand}
-              </p>
-            )}
-            {address && (
-              <p className="text-sm text-muted-foreground truncate mt-1">
-                <MapPin className="h-3 w-3 inline mr-1 opacity-70" />
-                {address}
-              </p>
-            )}
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="ml-2"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
 
-        {categories.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1 max-w-full">
-            {categories.slice(0, 3).map((category, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className="text-xs capitalize truncate max-w-[100px]"
-              >
-                {category}
-              </Badge>
-            ))}
-            {categories.length > 3 && (
-              <Badge variant="secondary" className="text-xs">
-                +{categories.length - 3} more
-              </Badge>
-            )}
-          </div>
-        )}
+        <Separator className="my-4" />
 
-        <Separator className="my-3" />
-
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex justify-between">
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center justify-center"
+            className="flex items-center"
             onClick={() => {
               window.open(
                 `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
@@ -126,41 +73,19 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
           </Button>
 
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
-            className="flex items-center justify-center"
-            onClick={() => {
-              console.log("Saved location:", location);
-            }}
+            className="flex items-center"
+            onClick={onClose}
           >
-            <Star className="h-4 w-4 mr-1.5" />
-            Save
+            Use This Location
           </Button>
-
-          {properties?.external_ids?.website && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="col-span-2 flex items-center justify-center mt-1"
-              onClick={() => {
-                window.open(properties.external_ids?.website, "_blank");
-              }}
-            >
-              <ExternalLink className="h-4 w-4 mr-1.5" />
-              Visit Website
-            </Button>
-          )}
         </div>
 
-        <div className="mt-3 pt-2 border-t text-xs text-muted-foreground">
-          <div className="flex justify-between items-center">
-            <span className="truncate max-w-[170px]">
-              ID: {properties?.mapbox_id?.substring(0, 8)}...
-            </span>
-            <span className="text-right">
-              {lat.toFixed(4)}, {lng.toFixed(4)}
-            </span>
-          </div>
+        <div className="mt-4 pt-3 border-t text-xs text-muted-foreground">
+          <p className="text-center">
+            Coordinates: {lat?.toFixed(6)}, {lng?.toFixed(6)}
+          </p>
         </div>
       </div>
     </Popup>

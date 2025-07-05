@@ -1,8 +1,7 @@
 "use client";
-
-import React, { useState, RefObject, useContext, createContext, useRef } from "react";
+import React, { useState, useContext, createContext, useRef } from "react";
 import { useTheme } from "next-themes";
-import Map, { Marker, ViewState } from "react-map-gl";
+import Map, { ViewState } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { MapRef } from 'react-map-gl';
 
@@ -12,12 +11,9 @@ type MapComponentProps = {
     latitude: number;
     zoom: number;
   };
-  markerCoords?: [number, number]; // [lng, lat]
   children?: React.ReactNode;
   bearing?: number;
   pitch?: number;
-  longitude: number;
-  latitude: number;
 };
 
 type MapContextType = {
@@ -26,12 +22,9 @@ type MapContextType = {
 
 export default function MapComponent({
   initialViewState,
-  longitude, latitude,
-  markerCoords = [longitude, latitude], // Default to NYC
   children,
 }: MapComponentProps) {
   const { resolvedTheme } = useTheme();
-
   const mapRef = useRef<MapRef | null>(null);
 
   const [viewState, setViewState] = useState<ViewState>({
@@ -43,9 +36,8 @@ export default function MapComponent({
 
   const [loaded, setLoaded] = useState(false);
 
-
   return (
-    <div className="z-[1000] relative">
+    <div className="z-10 relative">
       <MapContext.Provider value={{ mapRef }}>
         <Map
           {...viewState}
@@ -57,20 +49,14 @@ export default function MapComponent({
           dragRotate={false}
           touchZoomRotate={false}
           style={{ width: "100%", height: "100vh" }}
-
         >
-          {/* Optional Marker */}
-          {markerCoords && (
-            <Marker longitude={markerCoords[0]} latitude={markerCoords[1]} />
-          )}
-
-          {/* Any child content passed to the map */}
+          {/* Child components will handle markers */}
           {children}
         </Map>
       </MapContext.Provider>
 
       {!loaded && <LoadingOverlay />}
-    </div >
+    </div>
   );
 }
 

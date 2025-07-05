@@ -8,7 +8,6 @@ type PricePreset = {
 };
 
 const MapPriceFilter = () => {
-  // Slider state
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(400);
   const minRangeRef = useRef<HTMLInputElement>(null);
@@ -16,22 +15,21 @@ const MapPriceFilter = () => {
   const rangeTrackRef = useRef<HTMLDivElement>(null);
   const minGap = 10;
 
-  // Price presets
   const pricePresets: PricePreset[] = [
     { label: 'Free', min: 0, max: 0 },
     { label: 'Under $20', min: 0, max: 20 },
     { label: 'Under $50', min: 0, max: 50 },
-    { label: '$50-$100', min: 50, max: 100 }
+    { label: '$50 to $100', min: 50, max: 100 }
   ];
 
-  // Update range visualization
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     updateRangeVisual();
   }, [minValue, maxValue]);
 
   const updateRangeVisual = () => {
     if (!rangeTrackRef.current) return;
-    
     const minPercent = (minValue / 400) * 100;
     const maxPercent = (maxValue / 400) * 100;
     rangeTrackRef.current.style.left = `${minPercent}%`;
@@ -50,17 +48,56 @@ const MapPriceFilter = () => {
     }
   };
 
-  const applyPreset = (preset: PricePreset) => {
+  const applyPreset = async (preset: PricePreset) => {
     setMinValue(preset.min);
     setMaxValue(preset.max);
     if (minRangeRef.current) minRangeRef.current.value = preset.min.toString();
     if (maxRangeRef.current) maxRangeRef.current.value = preset.max.toString();
+    await sendPriceToAPI(preset.min, preset.max);
   };
 
-  return (
-    <div className="w-full bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-lg font-bold mb-4">PRICE RANGE</h2>
+  const sendPriceToAPI = async (min: number, max: number) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/ticketmaster', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceMin: min, priceMax: max })
+      });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Price filter updated:', data);
+      return data;
+    } catch (error) {
+      console.error('Error updating price filter:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Debounced API call for slider changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (minValue !== 0 || maxValue !== 400) { // Skip initial values
+        sendPriceToAPI(minValue, maxValue);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [minValue, maxValue]);
+
+  return (
+    <div className="w-full dark:bg-[#262626] bg-[#F5F5F4] p-6 rounded-lg shadow-lg z-[1000]">
+      <h2 className="text-lg font-bold mb-4">
+        PRICE RANGE
+        {isLoading && <span className="ml-2 text-sm text-gray-500">(Updating...)</span>}
+      </h2>
+
       {/* Slider */}
       <div className="relative mt-4 slider-container">
         <input
@@ -81,34 +118,42 @@ const MapPriceFilter = () => {
           onChange={(e) => handleSliderChange(false, parseInt(e.target.value))}
           className="absolute w-full bg-transparent pointer-events-none z-10"
         />
-        
-        <div className="relative w-full h-2 bg-gray-200 rounded-md">
+
+        <div className="relative w-full h-2 bg-gray-200 dark:bg-[#3A3A3A] rounded-md">
           <div
             ref={rangeTrackRef}
-            className="absolute h-2 bg-gradient-to-r from-blue-900 to-blue-400 rounded-md"
+            className="absolute h-2 bg-gradient-to-r from-purple-900 to-purple-400 rounded-md"
           />
         </div>
       </div>
-      
+
       {/* Price display */}
-      <div className="flex justify-between mt-3 text-gray-600 mb-4">
+      <div className="flex justify-between mt-3 text-gray-600 dark:text-gray-400 mb-4">
         <span>Min Price: ${minValue}</span>
         <span>Max Price: ${maxValue}</span>
       </div>
-      
+
       {/* Quick-select buttons */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-4 mx-4">
         {pricePresets.map((preset) => (
           <button
             key={preset.label}
             onClick={() => applyPreset(preset)}
-            className={`px-3 py-2 text-sm rounded-md transition-colors ${
-              minValue === preset.min && maxValue === preset.max
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-            }`}
+            disabled={isLoading}
+            className={`
+              px-3 py-2 text-sm rounded-md font-medium transition-all duration-300
+              focus:outline-none focus:ring-2 focus:ring-purple-500
+              hover:scale-105 text-center
+              ${minValue === preset.min && maxValue === preset.max
+                ? 'bg-purple-800 dark:bg-purple-600 text-white'
+                : 'bg-gray-100 dark:bg-[#3A3A3A] text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-[#4A4A4A]'}
+              ${isLoading ? 'opacity-80' : ''}
+            `}
+            role="tab"
+            aria-selected={minValue === preset.min && maxValue === preset.max}
+            aria-label={`Set price range to ${preset.label}`}
           >
-            {preset.label}
+            <p className='text-[.80rem] text-2xl'>{preset.label}</p>
           </button>
         ))}
       </div>
@@ -119,14 +164,14 @@ const MapPriceFilter = () => {
           appearance: none;
           height: 18px;
         }
-        
+
         input[type="range"]::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;
           width: 18px;
           height: 18px;
           background: white;
-          border: 3px solid #23a9f7;
+          border: 3px solid #ad46ff;
           border-radius: 50%;
           cursor: pointer;
           pointer-events: auto;
@@ -134,7 +179,7 @@ const MapPriceFilter = () => {
           z-index: 3;
           transform: translateY(-30%);
         }
-        
+
         input[type="range"]::-moz-range-thumb {
           width: 18px;
           height: 18px;
@@ -145,7 +190,7 @@ const MapPriceFilter = () => {
           pointer-events: auto;
           z-index: 3;
         }
-        
+
         .slider-container {
           position: relative;
           height: 18px;
