@@ -3,3 +3,5 @@ node_modules
 .env.localnode_modules/
 *.darwin-arm64.node
 node_modules/
+node_modules/
+*.darwin-arm64.node
